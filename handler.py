@@ -8,9 +8,14 @@ import torch
 from PIL import Image
 from fashn_vton import TryOnPipeline
 
+print("SERVERLESS HANDLER STARTING", flush=True)
+
 WEIGHTS_DIR = os.getenv("WEIGHTS_DIR", "./weights")
 
+print(f"WEIGHTS_DIR={WEIGHTS_DIR}", flush=True)
+print("LOADING PIPELINE", flush=True)
 pipeline = TryOnPipeline(weights_dir=WEIGHTS_DIR, device="cuda")
+print("PIPELINE LOADED", flush=True)
 
 
 def image_from_base64(data: str) -> Image.Image:
@@ -26,11 +31,15 @@ def image_to_base64(img: Image.Image) -> str:
 
 
 def handler(job):
+    print("JOB RECEIVED", flush=True)
+
     t0 = time.time()
     data = job["input"]
 
     person_image = image_from_base64(data["person_image_base64"])
     garment_image = image_from_base64(data["garment_image_base64"])
+
+    print("RUNNING PIPELINE", flush=True)
 
     with torch.inference_mode():
         result = pipeline(
@@ -45,9 +54,12 @@ def handler(job):
             segmentation_free=True,
         )
 
+    total = time.time() - t0
+    print(f"JOB DONE in {total:.3f}s", flush=True)
+
     return {
         "ok": True,
-        "server_total": round(time.time() - t0, 3),
+        "server_total": round(total, 3),
         "image_base64": image_to_base64(result.images[0]),
     }
 
