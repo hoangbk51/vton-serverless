@@ -1,0 +1,5 @@
+fastapi
+uvicorn
+python-multipart
+onnxruntime-gpu==1.20.1
+nvidia-cudnn-cu12
