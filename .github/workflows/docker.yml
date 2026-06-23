@@ -24,4 +24,4 @@ jobs:
           context: .
           file: Dockerfile.serverless
           push: true
-          tags: hoangk51bk/vton-serverless:latest
+          tags: hoangk51bk/vton-serverless:v2
